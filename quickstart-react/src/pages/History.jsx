@@ -1,0 +1,10 @@
+const History = () => {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <h1 className="text-3xl font-bold">History Page</h1>
+      </div>
+    );
+  };
+  
+  export default History;
+  

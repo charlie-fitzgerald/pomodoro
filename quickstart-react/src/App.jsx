@@ -1,6 +1,5 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import "./App.css";
 import mondaySdk from "monday-sdk-js";
 import "@vibe/core/tokens";
 //Explore more Monday React Components here: https://vibe.monday.com/
