@@ -1,9 +1,11 @@
+import PomodoroTimer from "../components/PomodoroTimer";
+
 const Home = () => {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <h1 className="text-3xl font-bold">Home Page</h1>
-      </div>
-    );
-  };
-  
-  export default Home;
+  return (
+    <div className="flex justify-center items-center h-full">
+      <PomodoroTimer />
+    </div>
+  );
+};
+
+export default Home;
