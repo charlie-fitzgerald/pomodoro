@@ -1,0 +1,13 @@
+{
+    "name": "Pomodoro Timer",
+    "slug": "pomodoro-timer",
+    "features": [
+      {
+        "type": "board-view",
+        "name": "Pomodoro Timer View",
+        "url": "https://<your-ngrok-url>/",
+        "height": 600
+      }
+    ]
+  }
+  

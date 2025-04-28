@@ -1,4 +1,4 @@
-import mondaySdk from "@mondaycom/apps-sdk";
+import mondaySdk from "monday-sdk";
 import { useEffect } from "react";
 
 const monday = mondaySdk();
