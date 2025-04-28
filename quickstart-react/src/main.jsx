@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import router from "./router";
-import "./styles/tailwind.css"; // Assuming Tailwind is set up
+import "./index.css"; // Assuming Tailwind is set up
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
