@@ -7,13 +7,13 @@ export function usePomodoro({
   longBreakDuration,
   longBreakAfter,
 }) {
-  const [secondsLeft, setSecondsLeft] = useState(focusDuration);
-  const [sessionType, setSessionType] = useState('focus');
-  const [sessionCount, setSessionCount] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
+  const [secondsLeft, setSecondsLeft]       = useState(focusDuration);
+  const [sessionType, setSessionType]       = useState('focus');
+  const [sessionCount, setSessionCount]     = useState(0);    // total completed focus sessions
+  const [cycleCount, setCycleCount]         = useState(0);    // focus sessions since last long break
+  const [isRunning, setIsRunning]           = useState(false);
   const intervalRef = useRef(null);
 
-  // 1) Define startSession before the effect
   const startSession = useCallback((type) => {
     setSessionType(type);
     setSecondsLeft(
@@ -26,22 +26,30 @@ export function usePomodoro({
     setIsRunning(true);
   }, [focusDuration, shortBreakDuration, longBreakDuration]);
 
-  // 2) Define handleSessionEnd before the effect
   const handleSessionEnd = useCallback(() => {
     if (sessionType === 'focus') {
-      const next = sessionCount + 1;
-      setSessionCount(next);
-      if (next % longBreakAfter === 0) {
-        startSession('longBreak');
-      } else {
-        startSession('shortBreak');
-      }
+      // finished a focus session
+      setSessionCount(prev => prev + 1);
+      setCycleCount(prevCycle => {
+        const nextCycle = prevCycle + 1;
+        if (nextCycle === longBreakAfter) {
+          startSession('longBreak');
+        } else {
+          startSession('shortBreak');
+        }
+        return nextCycle;
+      });
     } else {
+      // finished a break
+      if (sessionType === 'longBreak') {
+        // reset cycle count after long break
+        setCycleCount(0);
+      }
       startSession('focus');
     }
-  }, [sessionCount, sessionType, longBreakAfter, startSession]);
+  }, [sessionType, longBreakAfter, startSession]);
 
-  // 3) Now your effect can safely reference handleSessionEnd
+  // ticking & session rollover
   useEffect(() => {
     if (!isRunning) return;
     clearInterval(intervalRef.current);
@@ -60,7 +68,26 @@ export function usePomodoro({
     return () => clearInterval(intervalRef.current);
   }, [isRunning, sessionType, handleSessionEnd]);
 
-  // 4) Control handlers
+  // sync secondsLeft when durations change (only if not running)
+  useEffect(() => {
+    if (!isRunning) {
+      setSecondsLeft(
+        sessionType === 'focus'
+          ? focusDuration
+          : sessionType === 'shortBreak'
+          ? shortBreakDuration
+          : longBreakDuration
+      );
+    }
+  }, [
+    focusDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    sessionType,
+    isRunning,
+  ]);
+
+  // controls
   const start = () => setIsRunning(true);
   const pause = () => setIsRunning(false);
   const reset = () => {
@@ -69,11 +96,22 @@ export function usePomodoro({
     setSessionType('focus');
     setSecondsLeft(focusDuration);
     setSessionCount(0);
+    setCycleCount(0);
   };
 
-  // 5) Format for display
+  // formatted time
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
   const seconds = String(secondsLeft % 60).padStart(2, '0');
 
-  return { minutes, seconds, sessionType, isRunning, start, pause, reset };
+  return {
+    minutes,
+    seconds,
+    sessionType,
+    isRunning,
+    start,
+    pause,
+    reset,
+    cycleCount,    // focus sessions since last long break
+    sessionCount,  // total completed focus sessions
+  };
 }

@@ -1,9 +1,9 @@
 // /src/components/PomodoroTimer.jsx
 import React from 'react';
-import { useSettings } from '../context/SettingsContext';
-import { usePomodoro } from '../hooks/usePomodoro';
+import { useSettings }  from '../context/SettingsContext';
+import { usePomodoro }  from '../hooks/usePomodoro';
 
-const PomodoroTimer = () => {
+export default function PomodoroTimer() {
   const { settings } = useSettings();
   const {
     minutes,
@@ -12,6 +12,7 @@ const PomodoroTimer = () => {
     start,
     pause,
     reset,
+    cycleCount,
   } = usePomodoro({
     focusDuration:      settings.focus * 60,
     shortBreakDuration: settings.shortBreak * 60,
@@ -19,7 +20,6 @@ const PomodoroTimer = () => {
     longBreakAfter:     settings.longBreakFreq,
   });
 
-  // Map “focus” → “Focus Session”, etc.
   const sessionLabel =
     sessionType === 'focus'
       ? 'Focus Session'
@@ -27,19 +27,38 @@ const PomodoroTimer = () => {
       ? 'Short Break'
       : 'Long Break';
 
+  // build an array [0,1,2,3] to render 4 bullets
+  const bullets = Array.from({ length: settings.longBreakFreq });
+
   return (
     <div className="flex flex-col items-center justify-center h-full py-8 px-4">
-      {/* Timer Display */}
+
+      {/* ── Progress Indicator ── */}
+      <div className="flex gap-2 mb-4">
+        {bullets.map((_, idx) => (
+          <div
+            key={idx}
+            className={[
+              'w-4 h-4 rounded-full border',
+              idx < cycleCount
+                ? 'bg-green-500 border-green-500'
+                : 'bg-transparent border-gray-300',
+            ].join(' ')}
+          />
+        ))}
+      </div>
+
+      {/* ── Timer Display ── */}
       <div className="text-6xl font-bold mb-6">
         {minutes}:{seconds}
       </div>
 
-      {/* Session Type */}
+      {/* ── Session Type ── */}
       <div className="text-lg font-medium text-gray-600 mb-8">
         {sessionLabel}
       </div>
 
-      {/* Controls */}
+      {/* ── Controls ── */}
       <div className="flex space-x-4">
         <button
           onClick={start}
@@ -62,6 +81,4 @@ const PomodoroTimer = () => {
       </div>
     </div>
   );
-};
-
-export default PomodoroTimer;
+}
