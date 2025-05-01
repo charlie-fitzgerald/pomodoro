@@ -1,19 +1,27 @@
+// /src/context/SettingsContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { loadSettings, saveSettings } from '../services/storage';
+
+const defaultSettings = {
+  focusMin: 25,
+  focusSec: 0,
+  shortBreakMin: 5,
+  shortBreakSec: 0,
+  longBreakMin: 15,
+  longBreakSec: 0,
+  longBreakFreq: 4,
+};
 
 const SettingsContext = createContext();
 
 export function SettingsProvider({ children }) {
-  const [settings, setSettings] = useState({
-    focus: 25,
-    shortBreak: 5,
-    longBreak: 15,
-    longBreakFreq: 4,
-  });
+  const [settings, setSettings] = useState(defaultSettings);
 
   useEffect(() => {
     loadSettings().then(saved => {
-      if (saved) setSettings(saved);
+      if (saved) {
+        setSettings({ ...defaultSettings, ...saved });
+      }
     });
   }, []);
 
@@ -31,6 +39,8 @@ export function SettingsProvider({ children }) {
 
 export function useSettings() {
   const ctx = useContext(SettingsContext);
-  if (!ctx) throw new Error('useSettings must be inside SettingsProvider');
+  if (!ctx) {
+    throw new Error('useSettings must be used within a SettingsProvider');
+  }
   return ctx;
 }

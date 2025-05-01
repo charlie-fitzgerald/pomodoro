@@ -7,24 +7,73 @@ export default function SettingsPanel({ disabled }) {
   const [form, setForm] = useState(settings);
   const [isOpen, setIsOpen] = useState(true);
 
-  // Sync form state when settings load or change
+  // Keep form in sync with saved settings
   useEffect(() => {
     setForm(settings);
   }, [settings]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: Number(value) }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
-    if (Object.values(form).some(v => v <= 0)) {
-      alert('All values must be positive numbers.');
-      return;
+
+    // Validate: all ≥ 0, seconds < 60
+    const keys = [
+      'focusMin','focusSec',
+      'shortBreakMin','shortBreakSec',
+      'longBreakMin','longBreakSec',
+      'longBreakFreq'
+    ];
+
+    for (let key of keys) {
+      const v = form[key];
+      if (v < 0 || (key.endsWith('Sec') && v > 59) || (key === 'longBreakFreq' && v < 1)) {
+        alert('Please enter valid numbers:\n– Minutes ≥ 0\n– Seconds 0–59\n– Pomodoros until long break ≥ 1');
+        return;
+      }
     }
+
     updateSettings(form);
   };
+
+  // Helper to render two inputs (min + sec)
+  const fieldGroup = (label, minName, secName) => (
+    <div>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <div className="flex space-x-2">
+        <input
+          type="number"
+          name={minName}
+          min="0"
+          value={form[minName]}
+          onChange={handleChange}
+          disabled={disabled}
+          placeholder="Min"
+          className={`
+            w-1/2 bg-white dark:bg-gray-700 border rounded px-2 py-1
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'text-gray-900 dark:text-white'}
+          `}
+        />
+        <input
+          type="number"
+          name={secName}
+          min="0"
+          max="59"
+          value={form[secName]}
+          onChange={handleChange}
+          disabled={disabled}
+          placeholder="Sec"
+          className={`
+            w-1/2 bg-white dark:bg-gray-700 border rounded px-2 py-1
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'text-gray-900 dark:text-white'}
+          `}
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -33,15 +82,14 @@ export default function SettingsPanel({ disabled }) {
         flex flex-col
         bg-gray-400 dark:bg-gray-800
         text-white
-        transition-all duration-300 ease-in-out
-        overflow-hidden
+        transition-all duration-300 ease-in-out overflow-hidden
         ${isOpen
-          ? 'w-72 p-4 border-r border-gray-200 dark:border-gray-700'
+          ? 'w-80 p-4 border-r border-gray-200 dark:border-gray-700'
           : 'w-16 p-2 border-none'
         }
       `}
     >
-      {/* collapse/expand toggle */}
+      {/* Collapse/Expand Toggle */}
       <button
         onClick={() => setIsOpen(o => !o)}
         className="self-end mb-4 focus:outline-none"
@@ -58,38 +106,30 @@ export default function SettingsPanel({ disabled }) {
         </svg>
       </button>
 
-      {/* only render the form when expanded */}
       {isOpen && (
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4">
-          {[
-            { label: 'Pomodoro length (min)',        name: 'focus' },
-            { label: 'Short Break (min)',            name: 'shortBreak' },
-            { label: 'Long Break (min)',             name: 'longBreak' },
-            { label: 'Pomodoros until long break',   name: 'longBreakFreq' },
-          ].map(({ label, name }) => (
-            <div key={name}>
-              <label className="block text-sm font-medium mb-1">{label}</label>
-              <input
-                type="number"
-                name={name}
-                min="1"
-                value={form[name]}
-                onChange={handleChange}
-                disabled={disabled}
-                className={`
-                  w-full
-                  bg-white dark:bg-gray-700
-                  border border-gray-300 dark:border-gray-600
-                  rounded
-                  px-2 py-1
-                  ${disabled
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'text-gray-900 dark:text-white'
-                  }
-                `}
-              />
-            </div>
-          ))}
+          {fieldGroup('Pomodoro length', 'focusMin', 'focusSec')}
+          {fieldGroup('Short Break', 'shortBreakMin', 'shortBreakSec')}
+          {fieldGroup('Long Break', 'longBreakMin', 'longBreakSec')}
+
+          {/* Single-input for “pomodoros until long break” */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Pomodoros until long break
+            </label>
+            <input
+              type="number"
+              name="longBreakFreq"
+              min="1"
+              value={form.longBreakFreq}
+              onChange={handleChange}
+              disabled={disabled}
+              className={`
+                w-full bg-white dark:bg-gray-700 border rounded px-2 py-1
+                ${disabled ? 'opacity-50 cursor-not-allowed' : 'text-gray-900 dark:text-white'}
+              `}
+            />
+          </div>
 
           <div className="flex items-center space-x-2">
             <button
@@ -109,7 +149,7 @@ export default function SettingsPanel({ disabled }) {
                 <span className="cursor-help">?</span>
                 <div className="
                   absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2
-                  w-36 text-xs text-white bg-gray-900 p-2 rounded
+                  w-40 text-xs text-white bg-gray-900 p-2 rounded
                   opacity-0 group-hover:opacity-100 transition-opacity
                 ">
                   Pause the timer to edit settings

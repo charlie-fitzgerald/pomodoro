@@ -1,14 +1,19 @@
 // /src/pages/Home.jsx
 import React from 'react';
 import { useSettings } from '../context/SettingsContext';
-import { usePomodoro }  from '../hooks/usePomodoro';
-import SettingsPanel    from '../components/SettingsPanel';
-import PomodoroTimer    from '../components/PomodoroTimer';
+import { usePomodoro } from '../hooks/usePomodoro';
+import SettingsPanel from '../components/SettingsPanel';
+import PomodoroTimer from '../components/PomodoroTimer';
 
 export default function Home() {
   const { settings } = useSettings();
 
-  // single hook instance here
+  // derive total seconds from MM:SS fields
+  const focusDuration      = settings.focusMin      * 60 + settings.focusSec;
+  const shortBreakDuration = settings.shortBreakMin * 60 + settings.shortBreakSec;
+  const longBreakDuration  = settings.longBreakMin  * 60 + settings.longBreakSec;
+  const longBreakAfter     = settings.longBreakFreq;
+
   const {
     minutes,
     seconds,
@@ -18,22 +23,23 @@ export default function Home() {
     pause,
     reset,
     cycleCount,
-    sessionCount
+    sessionCount,
   } = usePomodoro({
-    focusDuration:      settings.focus * 60,
-    shortBreakDuration: settings.shortBreak * 60,
-    longBreakDuration:  settings.longBreak * 60,
-    longBreakAfter:     settings.longBreakFreq,
+    focusDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    longBreakAfter,
   });
 
   return (
     <div className="flex h-screen">
-      <aside className="w-72">
-        {/* pass the running state as a prop */}
+      {/* sidebar grows/shrinks with collapsed state */}
+      <aside className="flex-none">
         <SettingsPanel disabled={isRunning} />
       </aside>
+
+      {/* main timer area */}
       <main className="flex-1 flex flex-col items-center justify-center p-6">
-        {/* now the timer just takes props instead of calling the hook itself */}
         <PomodoroTimer
           minutes={minutes}
           seconds={seconds}
@@ -44,7 +50,7 @@ export default function Home() {
           reset={reset}
           cycleCount={cycleCount}
           sessionCount={sessionCount}
-          longBreakAfter={settings.longBreakFreq}
+          longBreakAfter={longBreakAfter}
         />
       </main>
     </div>

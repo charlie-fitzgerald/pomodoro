@@ -7,11 +7,11 @@ export function usePomodoro({
   longBreakDuration,
   longBreakAfter,
 }) {
-  const [secondsLeft, setSecondsLeft]       = useState(focusDuration);
-  const [sessionType, setSessionType]       = useState('focus');
-  const [sessionCount, setSessionCount]     = useState(0);    // total completed focus sessions
-  const [cycleCount, setCycleCount]         = useState(0);    // focus sessions since last long break
-  const [isRunning, setIsRunning]           = useState(false);
+  const [secondsLeft, setSecondsLeft]   = useState(focusDuration);
+  const [sessionType, setSessionType]   = useState('focus');
+  const [sessionCount, setSessionCount] = useState(0);
+  const [cycleCount, setCycleCount]     = useState(0);
+  const [isRunning, setIsRunning]       = useState(false);
   const intervalRef = useRef(null);
 
   const startSession = useCallback((type) => {
@@ -28,37 +28,37 @@ export function usePomodoro({
 
   const handleSessionEnd = useCallback(() => {
     if (sessionType === 'focus') {
-      // finished a focus session
       setSessionCount(prev => prev + 1);
       setCycleCount(prevCycle => {
-        const nextCycle = prevCycle + 1;
-        if (nextCycle === longBreakAfter) {
+        const next = prevCycle + 1;
+        if (next === longBreakAfter) {
           startSession('longBreak');
         } else {
           startSession('shortBreak');
         }
-        return nextCycle;
+        return next;
       });
     } else {
-      // finished a break
       if (sessionType === 'longBreak') {
-        // reset cycle count after long break
         setCycleCount(0);
       }
       startSession('focus');
     }
   }, [sessionType, longBreakAfter, startSession]);
 
-  // ticking & session rollover
   useEffect(() => {
     if (!isRunning) return;
     clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
       setSecondsLeft(prev => {
-        if (prev === 1) {
+        if (prev <= 1) {
+          // prevent double-calling on rapid ticks or StrictMode remounts
           clearInterval(intervalRef.current);
-          handleSessionEnd();
+          if (intervalRef.current) {
+            handleSessionEnd();
+            intervalRef.current = null;
+          }
           return 0;
         }
         return prev - 1;
@@ -68,7 +68,7 @@ export function usePomodoro({
     return () => clearInterval(intervalRef.current);
   }, [isRunning, sessionType, handleSessionEnd]);
 
-  // sync secondsLeft when durations change (only if not running)
+  // sync remaining time when durations or sessionType change (only when paused)
   useEffect(() => {
     if (!isRunning) {
       setSecondsLeft(
@@ -79,19 +79,13 @@ export function usePomodoro({
           : longBreakDuration
       );
     }
-  }, [
-    focusDuration,
-    shortBreakDuration,
-    longBreakDuration,
-    sessionType,
-    isRunning,
-  ]);
+  }, [focusDuration, shortBreakDuration, longBreakDuration, sessionType]);
 
-  // controls
   const start = () => setIsRunning(true);
   const pause = () => setIsRunning(false);
   const reset = () => {
     clearInterval(intervalRef.current);
+    intervalRef.current = null;
     setIsRunning(false);
     setSessionType('focus');
     setSecondsLeft(focusDuration);
@@ -99,7 +93,6 @@ export function usePomodoro({
     setCycleCount(0);
   };
 
-  // formatted time
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
   const seconds = String(secondsLeft % 60).padStart(2, '0');
 
@@ -111,7 +104,7 @@ export function usePomodoro({
     start,
     pause,
     reset,
-    cycleCount,    // focus sessions since last long break
-    sessionCount,  // total completed focus sessions
+    cycleCount,
+    sessionCount,
   };
 }
