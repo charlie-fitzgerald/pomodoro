@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen">
-      <aside className="w-72 border-r border-gray-200 dark:border-gray-700">
+      <aside className="w-72">
         {/* pass the running state as a prop */}
         <SettingsPanel disabled={isRunning} />
       </aside>
