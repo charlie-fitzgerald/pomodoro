@@ -1,74 +1,50 @@
 // /src/components/PomodoroTimer.jsx
 import React from 'react';
-import { useSettings }  from '../context/SettingsContext';
-import { usePomodoro }  from '../hooks/usePomodoro';
 
-export default function PomodoroTimer() {
-  const { settings } = useSettings();
-  const {
-    minutes,
-    seconds,
-    sessionType,
-    start,
-    pause,
-    reset,
-    cycleCount,
-  } = usePomodoro({
-    focusDuration:      settings.focus * 60,
-    shortBreakDuration: settings.shortBreak * 60,
-    longBreakDuration:  settings.longBreak * 60,
-    longBreakAfter:     settings.longBreakFreq,
-  });
-
+export default function PomodoroTimer({
+  minutes,
+  seconds,
+  sessionType,
+  isRunning,
+  start,
+  pause,
+  reset,
+  cycleCount,
+  longBreakAfter
+}) {
   const sessionLabel =
-    sessionType === 'focus'
-      ? 'Focus Session'
-      : sessionType === 'shortBreak'
-      ? 'Short Break'
-      : 'Long Break';
+    sessionType === 'focus'      ? 'Focus Session'
+  : sessionType === 'shortBreak' ? 'Short Break'
+  :                                'Long Break';
 
-  // build an array [0,1,2,3] to render 4 bullets
-  const bullets = Array.from({ length: settings.longBreakFreq });
+  const bullets = Array.from({ length: longBreakAfter });
 
   return (
-    <div className="flex flex-col items-center justify-center h-full py-8 px-4">
-
-      {/* ── Progress Indicator ── */}
-      <div className="flex gap-2 mb-4">
-        {bullets.map((_, idx) => (
+    <div className="flex flex-col items-center gap-4 p-4">
+      <div className="flex gap-2 mb-2">
+        {bullets.map((_, i) => (
           <div
-            key={idx}
-            className={[
-              'w-4 h-4 rounded-full border',
-              idx < cycleCount
-                ? 'bg-green-500 border-green-500'
-                : 'bg-transparent border-gray-300',
-            ].join(' ')}
+            key={i}
+            className={`w-3 h-3 rounded-full border ${
+              i < cycleCount ? 'bg-green-500 border-green-500' : 'bg-transparent border-gray-300'
+            }`}
           />
         ))}
       </div>
-
-      {/* ── Timer Display ── */}
-      <div className="text-6xl font-bold mb-6">
-        {minutes}:{seconds}
-      </div>
-
-      {/* ── Session Type ── */}
-      <div className="text-lg font-medium text-gray-600 mb-8">
-        {sessionLabel}
-      </div>
-
-      {/* ── Controls ── */}
+      <div className="text-6xl font-bold">{minutes}:{seconds}</div>
+      <div className="text-lg text-gray-600 mb-6">{sessionLabel}</div>
       <div className="flex space-x-4">
         <button
           onClick={start}
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded"
+          disabled={isRunning}
+          className="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-6 rounded"
         >
           Start
         </button>
         <button
           onClick={pause}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded"
+          disabled={!isRunning}
+          className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-6 rounded"
         >
           Pause
         </button>
