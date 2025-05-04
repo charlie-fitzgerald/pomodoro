@@ -2,6 +2,7 @@
   "name": "monday-react-quickstart-app",
   "version": "0.0.1",
   "private": true,
+  "homepage": "https://charlie-fitzgerald.github.io/pomodoro",
   "scripts": {
     "dev": "vite",
     "start": "npm run stop && concurrently \"npm run server\" \"npm run expose\"",
