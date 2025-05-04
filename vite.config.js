@@ -8,9 +8,5 @@ export default defineConfig(() => {
       outDir: 'build',
     },
     plugins: [react(), tailwindcss()],
-    server: {
-      port: 8301,
-      allowedHosts: ['.apps-tunnel.monday.app']
-    }
   };
 });
