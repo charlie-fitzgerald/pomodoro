@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "start": "npm run stop && concurrently \"npm run server\" \"npm run expose\"",
-    "build": "vite build",
+    "build": "vite build --output dist",
     "expose": "mapps tunnel:create -p 8301",
     "server": "vite",
     "test": "react-scripts test",
