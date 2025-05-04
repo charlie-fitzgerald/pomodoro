@@ -27,6 +27,14 @@ export default function Layout() {
             </li>
             <li>
               <Link
+                to="/about"
+                className="hover:text-gray-300"
+              >
+                About
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/history"
                 className="hover:text-gray-300"
               >

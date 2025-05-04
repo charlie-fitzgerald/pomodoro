@@ -108,9 +108,9 @@ export default function SettingsPanel({ disabled }) {
 
       {isOpen && (
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4">
-          {fieldGroup('Pomodoro length', 'focusMin', 'focusSec')}
-          {fieldGroup('Short Break', 'shortBreakMin', 'shortBreakSec')}
-          {fieldGroup('Long Break', 'longBreakMin', 'longBreakSec')}
+          {fieldGroup('Pomodoro length (min, sec)', 'focusMin', 'focusSec')}
+          {fieldGroup('Short Break (min, sec)', 'shortBreakMin', 'shortBreakSec')}
+          {fieldGroup('Long Break (min, sec)', 'longBreakMin', 'longBreakSec')}
 
           {/* Single-input for “pomodoros until long break” */}
           <div>

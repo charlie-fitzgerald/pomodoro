@@ -6,6 +6,7 @@ import History from "./pages/History";
 import Team from "./pages/Team";
 import Billing from "./pages/Billing";
 import ErrorPage from "./pages/ErrorPage";
+import About from "./pages/About";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "settings", element: <Settings /> },
+      { path: "about", element: <About /> },
       { path: "history", element: <History /> },
       { path: "team", element: <Team /> },
       { path: "billing", element: <Billing /> },
