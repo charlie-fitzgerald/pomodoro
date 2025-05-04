@@ -33,14 +33,14 @@ export default function Layout() {
                 History
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 to="/billing"
                 className="hover:text-gray-300"
               >
                 Billing
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 to="/team"

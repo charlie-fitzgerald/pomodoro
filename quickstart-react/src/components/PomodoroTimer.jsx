@@ -25,7 +25,7 @@ export default function PomodoroTimer({
         {bullets.map((_, i) => (
           <div
             key={i}
-            className={`w-3 h-3 rounded-full border ${
+            className={`w-4 h-4 rounded-full border-2 ${
               i < cycleCount ? 'bg-green-500 border-green-500' : 'bg-transparent border-gray-300'
             }`}
           />

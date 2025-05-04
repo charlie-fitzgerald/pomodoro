@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "dev": "vite",
     "start": "npm run stop && concurrently \"npm run server\" \"npm run expose\"",
     "build": "vite build",
     "expose": "mapps tunnel:create -p 8301",
@@ -12,10 +13,7 @@
     "stop": "kill-port 8301 && kill-port 4049 && kill-port 4040"
   },
   "dependencies": {
-    "@mondaycom/apps-sdk": "^2.1.2",
     "@tailwindcss/vite": "^4.1.4",
-    "@vibe/core": "^3.19.0",
-    "monday-sdk-js": "^0.5.5",
     "react-router-dom": "^7.5.2",
     "tailwindcss": "^4.1.4"
   },
@@ -35,7 +33,6 @@
     ]
   },
   "devDependencies": {
-    "@mondaycom/apps-cli": "^4.0.0",
     "@vitejs/plugin-react": "^4.3.2",
     "concurrently": "^5.2.0",
     "cross-port-killer": "^1.2.1",
