@@ -5,7 +5,7 @@ import { useSettings } from '../context/SettingsContext';
 export default function SettingsPanel({ disabled }) {
   const { settings, updateSettings } = useSettings();
   const [form, setForm] = useState(settings);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Keep form in sync with saved settings
   useEffect(() => {
