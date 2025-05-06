@@ -17,14 +17,14 @@ export default function Layout() {
                 Home
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 to="/settings"
                 className="hover:text-gray-300"
               >
                 Settings
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 to="/about"
