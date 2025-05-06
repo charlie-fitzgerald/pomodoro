@@ -5,7 +5,7 @@ import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 export default function SettingsPanel({ disabled }) {
   const { settings, updateSettings } = useSettings();
   const [form, setForm] = useState(settings);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setForm(settings);
@@ -70,7 +70,7 @@ export default function SettingsPanel({ disabled }) {
         {isOpen ? (
           <div className="flex items-center space-x-2">
             <h2 className="text-xl font-semibold">Settings</h2>
-            <Cog6ToothIcon className="w-5 h-5 text-white hover:animate-spin" />
+            <Cog6ToothIcon className="w-5 h-5 text-white" />
           </div>
         ) : null}
 
