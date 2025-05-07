@@ -30,34 +30,24 @@ export function usePomodoro({
 
   // ─── Phase advance logic ───────────────────────────────────────────────────
   const advancePhase = useCallback(() => {
-    // Update counts if focus just ended
     if (sessionType === 'focus') {
       setSessionCount(s => s + 1);
       setCycleCount(c => {
         const next = c + 1;
-        // decide next break
-        if (next === longBreakAfter) {
-          return next; // we'll reset after the long break
-        }
         return next;
       });
     }
 
-    // Determine next session type and reset cycle count if needed
     let nextType;
     if (sessionType === 'focus') {
-      // choose short or long break
       nextType = cycleCount + 1 === longBreakAfter ? 'longBreak' : 'shortBreak';
     } else {
-      // break just ended → back to focus
       nextType = 'focus';
       if (sessionType === 'longBreak') {
-        // reset the cycle counter after a long break
         setCycleCount(0);
       }
     }
 
-    // Initialize new phase
     setSessionType(nextType);
     const duration =
       nextType === 'focus'        ? focusDuration
@@ -65,7 +55,6 @@ export function usePomodoro({
     :                               longBreakDuration;
 
     setSecondsLeft(duration);
-    // set new end timestamp
     endTimeRef.current = Date.now() + duration * 1000;
   }, [
     sessionType,
@@ -83,33 +72,24 @@ export function usePomodoro({
     setSecondsLeft(remaining);
 
     if (remaining <= 0) {
-      // phase ended
       advancePhase();
     } else {
-      // schedule next frame
       rafRef.current = requestAnimationFrame(tick);
     }
   }, [advancePhase]);
 
   useEffect(() => {
     if (!isRunning) return;
-    // If this is a fresh start (no endTime), initialize it
     if (endTimeRef.current === null) {
       endTimeRef.current = Date.now() + secondsLeft * 1000;
     }
-    // begin ticking
     rafRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      // cleanup on pause or unmount
-      cancelAnimationFrame(rafRef.current);
-    };
+    return () => cancelAnimationFrame(rafRef.current);
   }, [isRunning, tick, secondsLeft]);
 
   // ─── Controls ──────────────────────────────────────────────────────────────
   const start = useCallback(() => {
     if (!isRunning) {
-      // on resume, set endTime from current secondsLeft
       endTimeRef.current = Date.now() + secondsLeft * 1000;
       setIsRunning(true);
     }
@@ -130,24 +110,17 @@ export function usePomodoro({
     endTimeRef.current = null;
   }, [focusDuration]);
 
-  // ─── Sync on config change (when paused) ───────────────────────────────────
+  // ─── Sync on config or session change (when paused) ─────────────────────────
   useEffect(() => {
-    if (!isRunning) {
-      // reset display to new durations on settings change
+    // Only reset display when settings or sessionType change and not running
+    if (!isRunning && endTimeRef.current === null) {
       const duration =
         sessionType === 'focus'        ? focusDuration
       : sessionType === 'shortBreak'  ? shortBreakDuration
       :                                  longBreakDuration;
       setSecondsLeft(duration);
-      endTimeRef.current = null;
     }
-  }, [
-    focusDuration,
-    shortBreakDuration,
-    longBreakDuration,
-    sessionType,
-    isRunning,
-  ]);
+  }, [focusDuration, shortBreakDuration, longBreakDuration, sessionType]);
 
   // ─── Formatted strings ─────────────────────────────────────────────────────
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
