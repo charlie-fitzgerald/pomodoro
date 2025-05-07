@@ -120,7 +120,7 @@ export function usePomodoro({
       :                                  longBreakDuration;
       setSecondsLeft(duration);
     }
-  }, [focusDuration, shortBreakDuration, longBreakDuration, sessionType]);
+  }, [focusDuration, shortBreakDuration, longBreakDuration, sessionType, isRunning]);
 
   // ─── Formatted strings ─────────────────────────────────────────────────────
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
